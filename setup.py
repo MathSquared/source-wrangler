@@ -6,5 +6,5 @@ setup(
     author="MathSquared",
     description="A source manager for research projects (not source code)",
     license="MIT",
-    packages=["source-wrangler"]
+    packages=["sourcewrangler"]
 )
