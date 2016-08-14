@@ -12,4 +12,5 @@ setup(
             "sw = sourcewrangler:main",
         ],
     },
+    test_suite="tests",
 )
