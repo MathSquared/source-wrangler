@@ -72,7 +72,7 @@ class ManifestFile(object):
     # These methods deal with context: creating and destroying a FileManifest.
 
     def __init__(self, fname, autocommit=True, lock=True):
-        self._fname = fname
+        self._fname = os.path.abspath(fname)
         self._autocommit = autocommit
         self._lock = lock
         self._mf = None
