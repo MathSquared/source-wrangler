@@ -1,4 +1,5 @@
 import json
+import os
 import re
 
 class Manifest(object):
@@ -72,6 +73,15 @@ class ManifestFile(object):
     # These methods deal with context: creating and destroying a FileManifest.
 
     def __init__(self, fname, autocommit=True, lock=True):
+        """Creates a new ManifestFile. Raises ValueError if the given file does not exist.
+        
+        Args:
+            fname: The file where this manifest is stored.
+            autocommit: If true, all method calls that modify the manifest write the results back to disk immediately. If false, you must call commit.
+            lock: If true, also generate a lock file that prevents multiple open ManifestFiles from governing the same file on disk.
+        """
+        if not os.path.isfile(fname):
+            raise ValueError
         self._fname = os.path.abspath(fname)
         self._autocommit = autocommit
         self._lock = lock
