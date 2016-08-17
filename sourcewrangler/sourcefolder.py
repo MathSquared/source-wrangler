@@ -1,6 +1,5 @@
 import datetime
 import os
-import os.path
 
 
 class IncompleteSourceFolderError(Exception):
