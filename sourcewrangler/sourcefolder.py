@@ -78,9 +78,9 @@ class SourceFolder(object):
         """Returns the absolute path to the folder on disk that this SourceFolder represents."""
         return self._fname
 
-    def create_manifest(self):
+    def open_manifest(self):
         """Returns a new ManifestFile for the manifest of this SourceFolder."""
-        return new manifest.ManifestFile(os.path.join(_fname, "manifest.json"))
+        return manifest.ManifestFile(os.path.join(_fname, "manifest.json"))
 
     @property
     def rbay(self):
