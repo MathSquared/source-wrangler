@@ -95,7 +95,10 @@ class SourceFolder(object):
         raise os.error
 
     def open_manifest(self):
-        """Returns a new ManifestFile for the manifest of this SourceFolder."""
+        """Returns a new ManifestFile for the manifest of this SourceFolder.
+        
+        Despite its name, this method does not return a file object or file-like object. See the ManifestFile documentation for details on its interface.
+        """
         return manifest.ManifestFile(os.path.join(_fname, "manifest.json"))
 
     @property
