@@ -1,3 +1,4 @@
+.*.swp
 env
 source_wrangler.egg-info
 *.pyc
