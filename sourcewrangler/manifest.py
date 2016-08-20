@@ -12,23 +12,24 @@ class Manifest(object):
         """Initializes a new Manifest object.
 
         Args:
-            fp: a file-like object storing the JSON file. It should be an array of objects.
+            fp: a readable file-like object storing the JSON file. It should be an array of objects. The Manifest does not preserve a reference to fp.
         """
         self._manifest = json.load(fp)
 
     def revert(self, fp):
-        """Overwrites this Manifest with the state of the given file-like object."""
+        """Overwrites this Manifest with the state of the given readable file-like object."""
         self._manifest = json.load(fp)
 
     def commit(self, fp):
-        """Writes the Manifest to the given file-like object."""
+        """Writes the Manifest to the given writable file-like object."""
         json.dump(self._manifest, fp)
 
     def get(self, key):
+        """Returns the dict representing the source with a given integer ID."""
         return self._manifest[key]
     
     def values(self, field):
-        """Returns a set of unique values of the given field among all sources in this manifest."""
+        """Returns a set of the unique values of the given field among all sources in this manifest."""
         found = set()
         for source in self._manifest:
             if field in source:
@@ -58,6 +59,7 @@ class Manifest(object):
         return idx
 
     def replace(self, key, source):
+        """Replaces the source at the given index with the given source."""
         if key >= len(self._manifest) or key < 0:
             raise IndexError
 
@@ -67,10 +69,10 @@ class Manifest(object):
 class ManifestFile(object):
     """Interacts with a manifest stored on disk, adding autocommit and locking features.
 
-    You should use this class in preference to Manifest when the manifest is stored on disk.
+    Methods that are not explicitly overriden in this class are delegated to Manifest (except that all functions that modify the manifest will trigger autocommit if it is set). You should use this class in preference to Manifest when the manifest is stored on disk.
     """
 
-    # These methods deal with context: creating and destroying a FileManifest.
+    # These methods deal with context: creating and destroying a ManifestFile.
 
     def __init__(self, fname, autocommit=True, lock=True):
         """Creates a new ManifestFile. Raises ValueError if the given file does not exist.
@@ -102,18 +104,19 @@ class ManifestFile(object):
         return self
 
     def close(self):
-        """Closes this FileManifest. Attempts to use a closed FileManifest will raise a ValueError."""
+        """Closes this ManifestFile. Attempts to use a closed FileManifest will raise a ValueError. This method is idempotent: attempts to close an already-closed ManifestFile will have no effect."""
         if self._lock:
             os.remove(fname + ".lock")
 
-        # We signal that a FileManifest has been closed by setting its manifest to None.
+        # We signal that a ManifestFile has been closed by setting its manifest to None.
         self._mf = None
 
     def __exit__(self, e_type, unused_e, unused_e_traceback):
+        # We can close it without checking if there was an exception, since closure is idempotent, and we shouldn't leave random lock files around.
+        self.close()
+
         if e_type:
             return False  # propagate the exception
-
-        self.close()
 
     # Reversions and commits shouldn't take a file-like object anymore.
 
