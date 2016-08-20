@@ -82,6 +82,10 @@ class SourceFolder(object):
         """Opens the file of the given name in the source folder. This does not check against e.g. someone passing in .., so it shouldn't be fed input that isn't trusted by the owner of the running user account."""
         return open(os.path.join(_fname, name), mode, buffering)
 
+    def available(self):
+        """Returns a list of the files in the receiving bay, in arbitrary order."""
+        return os.listdir(_fname)
+
     def open_manifest(self):
         """Returns a new ManifestFile for the manifest of this SourceFolder."""
         return manifest.ManifestFile(os.path.join(_fname, "manifest.json"))
