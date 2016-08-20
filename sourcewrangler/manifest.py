@@ -1,3 +1,4 @@
+import codecs
 import json
 import os
 import re
@@ -74,19 +75,21 @@ class ManifestFile(object):
 
     # These methods deal with context: creating and destroying a ManifestFile.
 
-    def __init__(self, fname, autocommit=True, lock=True):
+    def __init__(self, fname, autocommit=True, lock=True, encoding="utf_8"):
         """Creates a new ManifestFile. Raises ValueError if the given file does not exist.
         
         Args:
             fname: The file where this manifest is stored.
             autocommit: If true, all method calls that modify the manifest write the results back to disk immediately. If false, you must call commit.
             lock: If true, also generate a lock file that prevents multiple open ManifestFiles from governing the same file on disk.
+            encoding: The character encoding of the file on disk. You are strongly encouraged to use the default of UTF-8 for interoperability purposes.
         """
         if not os.path.isfile(fname):
             raise ValueError
         self._fname = os.path.abspath(fname)
         self._autocommit = autocommit
         self._lock = lock
+        self._encoding = encoding
         self._mf = None
 
         # Locking; create the file; we don't need the fd
@@ -96,7 +99,7 @@ class ManifestFile(object):
             except OSError:  # file already exists
                 raise FileLockError
 
-        with open(self._fname) as mf_file:
+        with codecs.open(self._fname, "r", encoding) as mf_file:
             self._mf = Manifest(mf_file)
 
     def __enter__(self):
@@ -124,14 +127,14 @@ class ManifestFile(object):
         if not self._mf:
             raise ValueError
 
-        with open(self._fname, "w") as mf_file:
+        with codecs.open(self._fname, "r", self._encoding) as mf_file:
             self._mf.revert(mf_file)
 
     def commit(self):
         if not self._mf:
             raise ValueError
 
-        with open(self._fname, "w") as mf_file:
+        with codecs.open(self._fname, "w", self._encoding) as mf_file:
             self._mf.commit(mf_file)
     
     # Other methods delegate to the Manifest, but we should autocommit and check for closure.
