@@ -86,6 +86,14 @@ class SourceFolder(object):
         """Returns a list of the files in the receiving bay, in arbitrary order."""
         return os.listdir(_fname)
 
+    def open_source(self, key, mode="r", buffering=-1):
+        """Opens the file corresponding to the source with the given key (which should be an integer). Raises os.error if such a file does not exist or cannot be opened. This does not check against e.g. someone passing in .., so it shouldn't be fed input that isn't trusted by the owner of the running user account."""
+        cached_string_key = str(key)
+        for candidate in self.available():
+            if candidate.startswith(cached_string_key):
+                return self.open(candidate, mode, buffering)
+        raise os.error
+
     def open_manifest(self):
         """Returns a new ManifestFile for the manifest of this SourceFolder."""
         return manifest.ManifestFile(os.path.join(_fname, "manifest.json"))
