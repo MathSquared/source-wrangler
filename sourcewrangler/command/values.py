@@ -3,7 +3,7 @@ import command
 @command.register_command("values")
 class ValuesCommand(object):
     
-    _help = "Find all values of a given field"
+    _help = "Find all values of a given field among all sources."
 
     _description = "Prints all unique values of a given metadata field, whether the author, category, media type, or title of each source."
     
