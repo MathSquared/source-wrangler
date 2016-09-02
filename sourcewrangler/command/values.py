@@ -9,7 +9,7 @@ class ValuesCommand(object):
     
     @staticmethod
     def specify_args(parser):
-        fields = parser.add_mutually_exclusive_group()
+        fields = parser.add_mutually_exclusive_group(required=True)
         fields.add_argument("-a", action="store_const", dest="field",
                             const="author",
                             help="Print all unique authors.")
