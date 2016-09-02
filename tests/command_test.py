@@ -19,7 +19,7 @@ class TestCommandRetriever(unittest.TestCase):
             def specify_args(argparse):
                 pass
 
-            def run(self, args):
+            def run(self, sf, args):
                 pass
 
         self.assertEqual(TestBasicCommand.name, "test_basic")
