@@ -4,6 +4,8 @@ SourceWrangler supports a variety of ways to download sources. Each way of retri
 
 All retrievers are classes decorated with @register_retriever('protocol'). Fields are expressed as methods, decorated with @required_field('field') or @optional_field('field'), which validate possible values for the field.
 
+All classes decorated with @register_retriever must declare an instance method called _run. It takes two arguments: a retrieval object (presumed to already have been validated) and a TemporaryFolder in which to store working results and output. It raises a RetrievalFailedError if the retrieval fails for some reason, and else returns a tuple of a TemporaryFile containing the content (presumably in the given TemporaryFolder) and its MIME type (or None if unknown).
+
 Retrievers are bestowed with certain public fields; see the documentation for register_retriever.
 
     http_retriever = get_retriever('http')
@@ -13,6 +15,16 @@ Retrievers are bestowed with certain public fields; see the documentation for re
 
 
 _registry = {}
+
+
+class RetrievalFailedError(Exception):
+    """General indication that the retrieval of a given source failed. Other retrievers should raise this exception if retrieval of a source fails, and possibly subclass it."""
+    def __init__(self, protocol, msg):
+        self._protocol = protocol
+        self._msg = msg
+
+    def __str__(self):
+        return "%s: %s" % (self._protocol, self._msg)
 
 
 class DuplicateFieldError(Exception):

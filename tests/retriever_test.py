@@ -33,7 +33,7 @@ class TestRegisterRetriever(unittest.TestCase):
         @retriever.register_retriever("test_basic")
         class TestBasicRetriever(object):
             def _run(self, retrieval, tmp_folder):
-                return "foo"
+                return "pretend this is a temp file", "text/plain"
 
         self.assertEqual(TestBasicRetriever.protocol, "test_basic")
         self.assertEqual(TestBasicRetriever.required, {})
@@ -44,7 +44,7 @@ class TestRegisterRetriever(unittest.TestCase):
             "spurious_field": "lolol"
         }))
 
-        self.assertEqual(TestBasicRetriever().run({}, None), "foo")
+        self.assertEqual(TestBasicRetriever().run({}, None), ("pretend this is a temp file", "text/plain"))
         self.assertRaises(retriever.InvalidRetrievalOptionsError, TestBasicRetriever().run, {
             "spurious_field": "lolol"
         }, None)
@@ -55,7 +55,7 @@ class TestRegisterRetriever(unittest.TestCase):
         @retriever.register_retriever("test_required")
         class TestRequiredRetriever(object):
             def _run(self, retrieval, tmp_folder):
-                return "foo"
+                return "pretend this is a temp file", "text/plain"
 
             @retriever.required_field("must_be_int")
             def validate_must_be_int(value):
@@ -81,7 +81,7 @@ class TestRegisterRetriever(unittest.TestCase):
         @retriever.register_retriever("test_optional")
         class TestOptionalRetriever(object):
             def _run(self, retrieval, tmp_folder):
-                return "foo"
+                return "pretend this is a temp file", "text/plain"
 
             @retriever.optional_field("may_supply_int")
             def validate_may_supply_int(value):
