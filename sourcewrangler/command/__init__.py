@@ -14,6 +14,11 @@ class ImproperlyDefinedCommandError(Exception):
     pass
 
 
+class UserError(Exception):
+    """Indicates that the user of a command misused it in some way, causing the command to complete unsuccessfully."""
+    pass
+
+
 def register_command(name):
     """Class decorator: marks a class as the command for a particular name.
 
