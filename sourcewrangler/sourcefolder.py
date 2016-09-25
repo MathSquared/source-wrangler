@@ -13,7 +13,7 @@ class SourceFolder(object):
     def check(fname):
         """Checks that a given relative or absolute path would yield a valid SourceFolder."""
         absfname = os.path.abspath(fname)
-        
+
         # Is it a directory?
         if not os.path.isdir(absfname):
             return False
@@ -86,17 +86,26 @@ class SourceFolder(object):
         """Returns a list of the files in the receiving bay, in arbitrary order."""
         return os.listdir(_fname)
 
-    def open_source(self, key, mode="r", buffering=-1):
-        """Opens the file corresponding to the source with the given key (which should be an integer). Raises os.error if such a file does not exist or cannot be opened. This does not check against e.g. someone passing in .., so it shouldn't be fed input that isn't trusted by the owner of the running user account."""
+    def get(self, key):
+        """Returns the filename of the file corresponding to the given source name. The filename is relative to the location of the source folder on disk. Raises KeyError if such a file does not exist, or if str(key) is the empty string."""
         cached_string_key = str(key)
+        if cached_string_key == "":
+            raise KeyError
         for candidate in self.available():
             if candidate.startswith(cached_string_key):
-                return self.open(candidate, mode, buffering)
-        raise os.error
+                return candidate
+        raise KeyError
+
+    def __getitem__(self, key):
+        return self.get(key)
+
+    def open_source(self, key, mode="r", buffering=-1):
+        """Opens the file corresponding to the source with the given key (which should be an integer). Raises KeyError if such a file does not exist, or os.error if it cannot be opened. This does not check against e.g. someone passing in .., so it shouldn't be fed input that isn't trusted by the owner of the running user account."""
+        return self.open(self.get(key), mode, buffering)
 
     def open_manifest(self):
         """Returns a new ManifestFile for the manifest of this SourceFolder.
-        
+
         Despite its name, this method does not return a file object or file-like object. See the ManifestFile documentation for details on its interface.
         """
         return manifest.ManifestFile(os.path.join(_fname, "manifest.json"))
@@ -125,7 +134,7 @@ class ReceivingBay(object):
     def fname(self):
         """Returns the absolute path to the folder on disk that this ReceivingBay represents."""
         return self._fname
-    
+
     def open(self, name, mode="r", buffering=-1):
         """Opens the file of the given name in the receiving bay. This does not check against e.g. someone passing in .., so it shouldn't be fed input that isn't trusted by the owner of the running user account."""
         return open(os.path.join(_fname, name), mode, buffering)
