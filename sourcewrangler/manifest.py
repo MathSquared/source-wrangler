@@ -5,7 +5,7 @@ import re
 
 class Manifest(object):
     """Represents the manifest for a given source folder.
-    
+
     The ManifestFile class adds locking and autocommit features, while providing a compatible interface to Manifest. You should prefer ManifestFile over Manifest when the manifest in question is stored on disk.
     """
 
@@ -28,7 +28,13 @@ class Manifest(object):
     def get(self, key):
         """Returns the dict representing the source with a given integer ID."""
         return self._manifest[key]
-    
+
+    def __getitem__(self, key):
+        return self.get(key)
+
+    def __len__(self):
+        return len(self._manifest)
+
     def values(self, field):
         """Returns a set of the unique values of the given field among all sources in this manifest."""
         found = set()
@@ -49,7 +55,7 @@ class Manifest(object):
                     results.append(key)
 
         return results
-    
+
     # These methods modify the manifest, and should trigger autocommit for ManifestFile.
     # If you define a new method that should trigger autocommit, mention it in ManifestFile.__getattr__.
 
@@ -77,7 +83,7 @@ class ManifestFile(object):
 
     def __init__(self, fname, autocommit=True, lock=True, encoding="utf_8"):
         """Creates a new ManifestFile. Raises ValueError if the given file does not exist.
-        
+
         Args:
             fname: The file where this manifest is stored.
             autocommit: If true, all method calls that modify the manifest write the results back to disk immediately. If false, you must call commit.
@@ -136,12 +142,12 @@ class ManifestFile(object):
 
         with codecs.open(self._fname, "w", self._encoding) as mf_file:
             self._mf.commit(mf_file)
-    
+
     # Other methods delegate to the Manifest, but we should autocommit and check for closure.
     def __getattr__(self, attr):
         if not self._mf:
             raise ValueError
-        
+
         # If autocommit is on, add and replace should commit.
         if self._autocommit and (attr == "add" or attr == "replace"):
             return lambda *args, **kwargs: getattr(self._mf, attr)(*args, **kwargs); self.commit()
