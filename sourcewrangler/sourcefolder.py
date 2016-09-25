@@ -99,6 +99,14 @@ class SourceFolder(object):
     def __getitem__(self, key):
         return self.get(key)
 
+    def __contains__(self, key):
+        # TODO make this less nasty
+        try:
+            self.get(key)
+        except KeyError:
+            return False
+        return True
+
     def open_source(self, key, mode="r", buffering=-1):
         """Opens the file corresponding to the source with the given key (which should be an integer). Raises KeyError if such a file does not exist, or os.error if it cannot be opened. This does not check against e.g. someone passing in .., so it shouldn't be fed input that isn't trusted by the owner of the running user account."""
         return self.open(self.get(key), mode, buffering)
